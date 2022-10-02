@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calc-frontend-deployment
+  labels:
+    app: calc-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: calc-frontend
+  template:
+    metadata:
+      labels:
+        app: calc-frontend
+    spec:
+      containers:
+      - name: calc-frontend-service
+        image: kaysush/calculator-service-front-end:1.0
+        env:
+        - name: BACKEND_SERVICE_URL
+          value: "http://calc-backend-service.default.svc.cluster.local"
+        - name: SIDEKICK_APIKEY
+          value: "e29ecc18-4fcc-4777-bb91-87c77a037d29"
+        - name: SIDEKICK_APPLICATION_NAME
+          value: "calc-frontend"
+        - name: SIDEKICK_APPLICATION_VERSION
+          value: "1.0"
+        - name: SIDEKICK_DEBUG_ENABLE
+          value: "True"
+        ports:
+        - containerPort: 5000
+          name: fe-svc-port
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: calc-frontend-service
+spec:
+  type: NodePort
+  selector:
+    app: calc-frontend
+  ports:
+    - port: 5000
+      targetPort: 5000

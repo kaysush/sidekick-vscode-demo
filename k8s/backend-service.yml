@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calc-backend-deployment
+  labels:
+    app: calc-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: calc-backend
+  template:
+    metadata:
+      labels:
+        app: calc-backend
+    spec:
+      containers:
+      - name: calc-backend-service
+        image: kaysush/calculator-service-back-end:1.0
+        env:
+        - name: PORT
+          value: "8080"
+        - name: SIDEKICK_APIKEY
+          value: "e29ecc18-4fcc-4777-bb91-87c77a037d29"
+        - name: SIDEKICK_APPLICATION_NAME
+          value: "calc-backend"
+        - name: SIDEKICK_APPLICATION_VERSION
+          value: "1.0"
+        - name: SIDEKICK_DEBUG_ENABLE
+          value: "True"
+        - name: NODE_OPTIONS
+          value: "-r @runsidekick/sidekick-agent-nodejs/dist/bootstrap"
+        ports:
+        - containerPort: 8080
+          name: be-svc-port
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: calc-backend-service
+spec:
+  selector:
+    app: calc-backend
+  ports:
+  - name: calc-backend-service
+    protocol: TCP
+    port: 80
+    targetPort: be-svc-port
